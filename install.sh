@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Author: Lukas Bures
-# Credits: Rolf Versluis
+# Credits: Rolf Versluis, https://blockoperations.com/how-to-build-and-operate-a-zencash-secure-node/
 
 # -----------------------------------------------------------------------------------------------------------------
 # YOU HAVE TO MANUALLY SET THESE VARIABLES:
