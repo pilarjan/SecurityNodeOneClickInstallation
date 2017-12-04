@@ -91,8 +91,8 @@ sudo ~/.acme.sh/acme.sh --issue --standalone -d $FQDN
 # Install the crontab that will check the script expiration date and renew it if necessary:
 cd
 touch ".selected_editor"
-sudo echo "SELECTED_EDITOR=\"/bin/nano\"" >> /$USER/.selected_editor
-(crontab -l -u $USER 2>/dev/null; echo "6 0 * * * \"/$USER/.acme.sh\"/acme.sh --cron --home \"/$USER/.acme.sh\" > /dev/null") | crontab -
+sudo echo "SELECTED_EDITOR=\"/bin/nano\"" >> /home/$USER/.selected_editor
+(crontab -l -u $USER 2>/dev/null; echo "6 0 * * * \"/home/$USER/.acme.sh\"/acme.sh --cron --home \"/home/$USER/.acme.sh\" > /dev/null") | crontab -
 
 # Copy the intermediate authority certificate to the Ubuntu certificate store and install it. Best way to do this is copy
 # the next section into a text file, like Notepad, substituting your actual username and FQDN for the <USER> and <FQDN>
@@ -109,7 +109,7 @@ pkill -f zend
 zen-cli stop
 
 # Update zend.conf file
-sudo echo "tlscertpath=/home/$USER/.acme.sh/$FQDN/$FQDN.cer\ntlskeypath=/home/$USER/.acme.sh/$FQDN/$FQDN.key" >> ~/.zen/zen.conf
+sudo echo -e "tlscertpath=/home/$USER/.acme.sh/$FQDN/$FQDN.cer\ntlskeypath=/home/$USER/.acme.sh/$FQDN/$FQDN.key" >> ~/.zen/zen.conf
 
 # Run ZEND again
 zend
