@@ -51,3 +51,10 @@ fabric.properties
 
 foo.sh
 my_config.sh
+
+.idea/SecurityNodeOneClickInstallation.iml
+.idea/inspectionProfiles/
+.idea/misc.xml
+.idea/modules.xml
+.idea/preferred-vcs.xml
+.idea/vcs.xml
