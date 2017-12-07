@@ -6,7 +6,24 @@
 # -----------------------------------------------------------------------------------------------------------------
 # YOU HAVE TO MANUALLY SET THESE VARIABLES:
 # Fully Qualified Domain Name
-FQDN="zennode.info"
+if [[ $EUID = 0 ]]; then
+   echo -e "\e[41m\e[1mYou are root, this script will not execute while you are root.\e[49m\e[8m"
+   echo -e "Please run the following commands:"
+   echo -e "\e[33madduser <ENTER YOUR NEW USER NAME> \e[96m(without <>) Enter your password you can just press Enter through all other details."
+   echo -e "\e[33musermod -g sudo <ENTER YOUR NEW USER NAME AS ABOVE>"
+   echo -e "chown <ENTER YOUR NEW USER NAME AS ABOVE>:<ENTER YOUR NEW USER NAME AS ABOVE> <this script name> \e[96m Don't forget the ':'. \e[49m\e[8m"
+   echo -e "\e[33msudo su <ENTER YOUR NEW USER NAME AS ABOVE>"
+   echo -e "\e[91mthen rerun this script\e[39m"
+   exit 100
+fi
+
+echo "Enter your full domain name e.g. mysecurenode.fictionaldomainname.com, followed by [ENTER]:"
+
+read FQDN
+
+sudo hostname - b $FQDN
+bash
+
 
 # -----------------------------------------------------------------------------------------------------------------
 echo $USER
