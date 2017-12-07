@@ -13,9 +13,6 @@ sudo apt-get install -y build-essential pkg-config libc6-dev m4 g++-multilib aut
 git htop python zlib1g-dev wget bsdmainutils automake libgtk2.0-dev && apt-get autoremove -y
 
 #ztjA9FPG1h92AAZYKhA6RUnggVLLinjiDGLbeR5wFKtt4LPd7TQgA9ufkRVSvVEj7eQUiWMrmjD2C8FEVw8KUufkbbCfcQ8
-T_ADDRESSES=(zthKXBuBcRmc9bJdy6mHkcYmoZ4uxJa34oA\
-             two\
-             three)
 
 ########################################## Set environment variables ###################################################
 # Quit on any error.
@@ -23,28 +20,18 @@ set -e
 purpleColor='\033[0;95m'
 normalColor='\033[0m'
 
-HOST=$(hostname -f)
-T_ADDRESS=T_ADDRESSES[ ${HOST} ]
-MAIL=
-DOMAIN=
-HOST_NAME=${HOST}.${DOMAIN}
-FQDN=${HOST_NAME}
-USER=$(whoami)
-IPv=4
-REGION=eu
+source my_config.sh
+declare T_ADDRESS_NAME=T_ADDRESS_${HOST}
+T_ADDRESS=${!T_ADDRESS_NAME}
+
+echo ${T_ADDRESS_NAME}
+echo ${T_ADDRESS}
 
 # read -p "Enter Host Name (a.example.com): " HOST_NAME
 if [[ ${HOST_NAME} == "" ]]; then
   echo "HOST name is required!"
   exit 1
 fi
-
-# zen installation method:
-# DEFAULT="1"
-# read -p "Enter 1 to build ZEN from repo; enter 2 to build from source: (default 1)" ZEN_INSTALL_CHOICE
-# ZEN_INSTALL_CHOICE="${ZEN_INSTALL_CHOICE:-${DEFAULT}}"
-ZEN_INSTALL_CHOICE=1
-
 
 echo -e ${purpleColor}"Host: $HOST\n"${normalColor}
 echo -e ${purpleColor}"T address: $T_ADDRESS\n"${normalColor}
@@ -96,12 +83,12 @@ fi
 echo -e ${purpleColor}"Swapfile is done!"${normalColor}
 
 #################################### Create an empty zen config file and add new config settings. ######################
-if [ -f /$USER/.zen/zen.conf ]; then
-  sudo rm /$USER/.zen/zen.conf || true
+if [ -f /${USER}/.zen/zen.conf ]; then
+  sudo rm /${USER}/.zen/zen.conf || true
 fi
 echo "Creating an empty ZenCash config..."
-sudo mkdir -p /$USER/.zen || true
-sudo touch /$USER/.zen/zen.conf
+sudo mkdir -p /${USER}/.zen || true
+sudo touch /${USER}/.zen/zen.conf
 
 RPC_USERNAME=$(pwgen -s 16 1)
 RPC_PASSWORD=$(pwgen -s 64 1)
@@ -129,24 +116,24 @@ echo -e ${purpleColor}"zen.conf is done!"${normalColor}
 
 
 ############################################################### ssl-certificate: #######################################
-if [ ! -d /$USER/acme.sh ]; then
+if [ ! -d /${USER}/acme.sh ]; then
   sudo apt install socat
-  cd /$USER && git clone https://github.com/Neilpang/acme.sh.git
-  cd /$USER/acme.sh && sudo ./acme.sh --install
-  sudo chown -R $USER:$USER /$USER/.acme.sh
+  cd /${USER} && git clone https://github.com/Neilpang/acme.sh.git
+  cd /${USER}/acme.sh && sudo ./acme.sh --install
+  sudo chown -R ${USER}:${USER} /${USER}/.acme.sh
 fi
-if [ ! -f /$USER/.acme.sh/$HOST_NAME/ca.cer ]; then
-  sudo /$USER/.acme.sh/acme.sh --issue --standalone -d $HOST_NAME
+if [ ! -f /${USER}/.acme.sh/${HOST_NAME}/ca.cer ]; then
+  sudo /${USER}/.acme.sh/acme.sh --issue --standalone -d ${HOST_NAME}
 fi
 cd ~
-sudo cp /$USER/.acme.sh/$HOST_NAME/ca.cer /usr/local/share/ca-certificates/$HOST_NAME.crt
+sudo cp /${USER}/.acme.sh/${HOST_NAME}/ca.cer /usr/local/share/ca-certificates/${HOST_NAME}.crt
 sudo update-ca-certificates
 CRONCMD_ACME="6 0 * * * \"/$USER/.acme.sh\"/acme.sh --cron --home \"/$USER/.acme.sh\" > /dev/null" && (crontab -l | grep -v -F "$CRONCMD_ACME" ; echo "$CRONCMD_ACME") | crontab -
 echo -e ${purpleColor}"certificates has been installed!"${normalColor}
 
 
 ############################################################ Installing zen: ###########################################
-case $ZEN_INSTALL_CHOICE in
+case ${ZEN_INSTALL_CHOICE} in
   1)
      echo "BUILD FROM REPO:"
      if ! [ -x "$(command -v zend)" ]; then
@@ -212,8 +199,8 @@ sudo npm install -g n
 sudo n latest
 sudo npm install pm2 -g
 if [ ! -d /$USER/secnodetracker ]; then
-  cd /$USER && git clone https://github.com/ZencashOfficial/secnodetracker.git
-  cd /$USER/secnodetracker && npm install
+  cd /${USER} && git clone https://github.com/ZencashOfficial/secnodetracker.git
+  cd /${USER}/secnodetracker && npm install
 fi
 echo -e ${purpleColor}"secnodetracker added!"${normalColor}
 
