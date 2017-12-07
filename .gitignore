@@ -50,5 +50,7 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
-.gitignore
 .idea/
+
+my_config.sh
+foo.sh
