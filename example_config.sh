@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 
-# -------------------------------------------------------------------------------------
-# NOTE! : fill MAIL and DOMAIN variables and rename this file to my_config.sh and save
-# -------------------------------------------------------------------------------------
-
 MAIL=
 DOMAIN=
 HOST=$(hostname -f)
@@ -18,25 +14,28 @@ REGION=eu
 # ZEN_INSTALL_CHOICE="${ZEN_INSTALL_CHOICE:-${DEFAULT}}"
 ZEN_INSTALL_CHOICE=1
 
-echo ${HOST}
-echo ${MAIL}
-echo ${DOMAIN}
-echo ${HOST_NAME}
-echo ${FQDN}
-echo ${USER}
-echo ${IPv}
-echo ${REGION}
-echo ${ZEN_INSTALL_CHOICE}
+purpleColor='\033[0;95m'
+normalColor='\033[0m'
+echo -e ${purpleColor}"---------------------------------------------------------------------------------"
+echo -e ${purpleColor}"Host: $HOST"
+echo -e ${purpleColor}"Email: $MAIL"
+echo -e ${purpleColor}"Domain: $DOMAIN"
+echo -e ${purpleColor}"Host name: $HOST_NAME"
+echo -e ${purpleColor}"FQDN: $FQDN"
+echo -e ${purpleColor}"IP version: $IPv"
+echo -e ${purpleColor}"Region: $REGION"
+if [ "${ZEN_INSTALL_CHOICE}" -eq "1" ]; then
+    echo -e ${purpleColor}"Install ZEN from: repository (default)"
+else
+    echo -e ${purpleColor}"Install ZEN from: source"
+fi
+echo -e ${purpleColor}"---------------------------------------------------------------------------------"${normalColor}
 
 T_ADDRESS_000=
 T_ADDRESS_001=
 T_ADDRESS_002=
 T_ADDRESS_003=
 T_ADDRESS_004=
-T_ADDRESS_005=
-T_ADDRESS_006=
-T_ADDRESS_007=
-T_ADDRESS_008=
-T_ADDRESS_009=
+
 
 echo "Loading from my_config.sh has been finished!"
