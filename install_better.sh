@@ -202,6 +202,7 @@ echo -e ${purpleColor}"Synced # of blocks: "${N_BLOCK}${normalColor}
 
 ########################################### run znode and sync chain on startup of VM: #################################
 CRONCMD="@reboot /usr/bin/zend" && (crontab -l | grep -v -F "$CRONCMD" ; echo "$CRONCMD") | crontab -
+CRONCMD="@reboot cd /root/secnodetracker/ && /usr/local/bin/node app.js &" && (crontab -l | grep -v -F "$CRONCMD" ; echo "$CRONCMD") | crontab -
 
 ####################################################### secnodetracker #################################################
 if [ ! -d /${USER}/secnodetracker ]; then
@@ -248,13 +249,11 @@ sudo echo -n ${RPC_USERNAME} >> /${USER}/secnodetracker/config/rpcuser
 touch /${USER}/secnodetracker/config/servers
 sudo echo -n "ts1.eu,ts1.na,ts1.sea" >> /${USER}/secnodetracker/config/servers
 
-echo -e ${purpleColor}"Z address: "${Z_ADDRESS}${normalColor}
 N_BLOCK=`zen-cli getblockcount`
 echo -e ${purpleColor}"Synced # of blocks: "${N_BLOCK}${normalColor}
-cd
 
+echo -e ${purpleColor}"Z address: "${Z_ADDRESS}${normalColor}
 
+reboot now
 
-cd secnodetracker
-node app.js &
 
