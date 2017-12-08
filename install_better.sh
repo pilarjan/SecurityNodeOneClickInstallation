@@ -6,19 +6,11 @@ exec > >(tee -i log_SN_installation.txt)
 # Without this, only stdout would be captured - i.e. your log file would not contain any error messages.
 exec 2>&1
 
-# IMPORTANT: Run this script from /root/ directory: bash -c "$(curl SCRIPT_URL)"
-# Once you get the VM up and running you need to login with your root account and run below commands.
-sudo apt-get update && apt-get upgrade -y
-sudo apt-get install -y build-essential pkg-config libc6-dev m4 g++-multilib autoconf monit libtool ncurses-dev unzip\
-git htop python zlib1g-dev wget bsdmainutils automake libgtk2.0-dev && apt-get autoremove -y
-
-#ztjA9FPG1h92AAZYKhA6RUnggVLLinjiDGLbeR5wFKtt4LPd7TQgA9ufkRVSvVEj7eQUiWMrmjD2C8FEVw8KUufkbbCfcQ8
-
 ########################################## Set environment variables ###################################################
 # Quit on any error.
 set -e
-purpleColor='\033[0;95m'
-normalColor='\033[0m'
+purpleColor="\033[0;95m"
+normalColor="\033[0m"
 
 source my_config.sh
 declare T_ADDRESS_NAME=T_ADDRESS_${HOST}
@@ -27,34 +19,45 @@ T_ADDRESS=${!T_ADDRESS_NAME}
 echo ${T_ADDRESS_NAME}
 echo ${T_ADDRESS}
 
-# read -p "Enter Host Name (a.example.com): " HOST_NAME
+# read -p "Enter Host Name (a.example.com): " HOST_NA./ME
 if [[ ${HOST_NAME} == "" ]]; then
   echo "HOST name is required!"
   exit 1
 fi
 
-echo -e ${purpleColor}"Host: $HOST\n"${normalColor}
-echo -e ${purpleColor}"T address: $T_ADDRESS\n"${normalColor}
-echo -e ${purpleColor}"Email: $MAIL\n"${normalColor}
-echo -e ${purpleColor}"Domain: $DOMAIN\n"${normalColor}
-echo -e ${purpleColor}"Host name: $HOST_NAME\n"${normalColor}
-echo -e ${purpleColor}"FQDN: $FQDN\n"${normalColor}
-echo -e ${purpleColor}"User: $USER\n"${normalColor}
-echo -e ${purpleColor}"IP version: $IPv\n"${normalColor}
-echo -e ${purpleColor}"Region: $REGION\n"${normalColor}
-if [[${ZEN_INSTALL_CHOICE} == 1]]; then
-    echo -e ${purpleColor}"Install ZEN from repository\n"${normalColor}
+echo -e ${purpleColor}"---------------------------------------------------------------------------------"
+echo -e ${purpleColor}"Host: $HOST"
+echo -e ${purpleColor}"T address: $T_ADDRESS"
+echo -e ${purpleColor}"Email: $MAIL"
+echo -e ${purpleColor}"Domain: $DOMAIN"
+echo -e ${purpleColor}"Host name: $HOST_NAME"
+echo -e ${purpleColor}"FQDN: $FQDN"
+echo -e ${purpleColor}"User: $USER"
+echo -e ${purpleColor}"IP version: $IPv"
+echo -e ${purpleColor}"Region: $REGION"
+if [ "${ZEN_INSTALL_CHOICE}" -eq "1" ]; then
+    echo -e ${purpleColor}"Install ZEN from: repository (default)"
 else
-    echo -e ${purpleColor}"Install ZEN from source\n"${normalColor}
+    echo -e ${purpleColor}"Install ZEN from: source"
 fi
+echo -e ${purpleColor}"---------------------------------------------------------------------------------"${normalColor}
+
 
 ################################################################# packages #############################################
-sudo apt-get update
-sudo apt -y install pwgen
-sudo apt-get install git -y
-sudo apt -y install fail2ban
-sudo systemctl enable fail2ban
-sudo systemctl start fail2ban
+locale-gen en_US en_US.UTF-8 cs_CZ cs_CZ.UTF-8
+dpkg-reconfigure locales
+
+sudo apt-get update && apt-get upgrade -y
+sudo apt-get install -y build-essential pkg-config libc6-dev m4 g++-multilib autoconf monit libtool ncurses-dev unzip git htop python zlib1g-dev wget bsdmainutils pwgen automake libgtk2.0-dev
+# sudo apt-get install -y rkhunter fail2ban
+# sudo systemctl enable fail2ban
+# sudo systemctl start fail2ban
+sudo apt -y install npm
+sudo npm install -g n
+sudo n 8.9
+sudo npm install pm2 -g
+sudo apt-get autoremove -y
+
 
 ################################################################ basic security ########################################
 sudo ufw default allow outgoing
@@ -72,7 +75,7 @@ echo -e ${purpleColor}"Basic security completed!"${normalColor}
 ################################################################# Add a swapfile. ######################################
 if [ $(cat /proc/swaps | wc -l) -eq 2 ]; then
   echo "Configuring your swapfile..."
-  sudo fallocate -l 4G /swapfile
+  sudo fallocate -l 3G /swapfile
   sudo chmod 600 /swapfile
   sudo mkswap /swapfile
   sudo swapon /swapfile
@@ -152,28 +155,28 @@ case ${ZEN_INSTALL_CHOICE} in
   ;;
   2)
     echo "BUILD FROM SOURCE:"
-    if ! [ -x "$(command -v /$USER/zen/src/zend)" ]; then
+    if ! [ -x "$(command -v /${USER}/zen/src/zend)" ]; then
       # Clone ZenCash from Git repo.
-      if [ -d /$USER/zen ]; then
-        sudo rm -r /$USER/zen
+      if [ -d /${USER}/zen ]; then
+        sudo rm -r /${USER}/zen
       fi
       echo "Downloading ZenCash source..."
       git clone https://github.com/ZencashOfficial/zen.git
 
       # Download proving keys.
-      if [ ! -f /$USER/.zcash-params/sprout-proving.key ]; then
+      if [ ! -f /${USER}/.zcash-params/sprout-proving.key ]; then
         echo "Downloading ZenCash keys..."
-        sudo /$USER/zen/zcutil/fetch-params.sh
+        sudo /${USER}/zen/zcutil/fetch-params.sh
       fi
 
       # Compile source.
       echo -e ${purpleColor}"Compiling ZenCash..."${normalColor}
-      cd /$USER/zen && ./zcutil/build.sh -j$(nproc)
-      sudo chown -R $USER:$USER /$USER/.zen
+      cd /${USER}/zen && ./zcutil/build.sh -j$(nproc)
+      sudo chown -R ${USER}:${USER} /${USER}/.zen
 
       # copy executable to the bin directory.
-      sudo cp /$USER/zen/src/zend /usr/bin/
-      sudo cp /$USER/zen/src/zen-cli /usr/bin/
+      sudo cp /${USER}/zen/src/zend /usr/bin/
+      sudo cp /${USER}/zen/src/zen-cli /usr/bin/
     fi
   ;;
   *)
@@ -184,50 +187,74 @@ esac
 
 
 # Create a shielded address on the zen node:
+zend
+sleep 5
 zen-cli z_getnewaddress
-zen-cli z_listaddresses
+Z_OUTPUT=`zen-cli z_listaddresses`
+Z_OUTPUT2=${Z_OUTPUT:5}
+Z_ADDRESS=${Z_OUTPUT2::-3}
+zen-cli getnetworkinfo
 
-echo -e ${purpleColor}"zen installation is finished!"${normalColor}
+echo -e ${purpleColor}"Zen installation is finished!"${normalColor}
+N_BLOCK=`zen-cli getblockcount`
+echo -e ${purpleColor}"Synced # of blocks: "${N_BLOCK}${normalColor}
 
 
 ########################################### run znode and sync chain on startup of VM: #################################
 CRONCMD="@reboot /usr/bin/zend" && (crontab -l | grep -v -F "$CRONCMD" ; echo "$CRONCMD") | crontab -
 
 ####################################################### secnodetracker #################################################
-sudo apt -y install npm
-sudo npm install -g n
-sudo n latest
-sudo npm install pm2 -g
-if [ ! -d /$USER/secnodetracker ]; then
+if [ ! -d /${USER}/secnodetracker ]; then
   cd /${USER} && git clone https://github.com/ZencashOfficial/secnodetracker.git
   cd /${USER}/secnodetracker && npm install
 fi
+cd
 echo -e ${purpleColor}"secnodetracker added!"${normalColor}
 
-cd secnodetracker && node setup.js
-node app.js
+############################################### sec-node-tracker-config ################################################
+cd secnodetracker
+mkdir config
+
+touch /${USER}/secnodetracker/config/stakeaddr
+sudo echo -n ${T_ADDRESS} >> /${USER}/secnodetracker/config/stakeaddr
+
+touch /${USER}/secnodetracker/config/email
+sudo echo -n ${MAIL} >> /${USER}/secnodetracker/config/email
+
+touch /${USER}/secnodetracker/config/fqdn
+sudo echo -n ${FQDN} >> /${USER}/secnodetracker/config/fqdn
+
+touch /${USER}/secnodetracker/config/ipv
+sudo echo -n ${IPv} >> /${USER}/secnodetracker/config/ipv
+
+touch /${USER}/secnodetracker/config/region
+sudo echo -n ${REGION} >> /${USER}/secnodetracker/config/region
+
+touch /${USER}/secnodetracker/config/home
+sudo echo -n "ts1."${REGION} >> /${USER}/secnodetracker/config/home
+
+touch /${USER}/secnodetracker/config/rpchost
+sudo echo -n "127.0.0.1" >> /${USER}/secnodetracker/config/rpchost
+
+touch /${USER}/secnodetracker/config/rpcpassword
+sudo echo -n ${RPC_PASSWORD} >> /${USER}/secnodetracker/config/rpcpassword
+
+touch /${USER}/secnodetracker/config/rpcport
+sudo echo -n "18231" >> /${USER}/secnodetracker/config/rpcport
+
+touch /${USER}/secnodetracker/config/rpcuser
+sudo echo -n ${RPC_USERNAME} >> /${USER}/secnodetracker/config/rpcuser
+
+touch /${USER}/secnodetracker/config/servers
+sudo echo -n "ts1.eu,ts1.na,ts1.sea" >> /${USER}/secnodetracker/config/servers
+
+echo -e ${purpleColor}"Z address: "${Z_ADDRESS}${normalColor}
+N_BLOCK=`zen-cli getblockcount`
+echo -e ${purpleColor}"Synced # of blocks: "${N_BLOCK}${normalColor}
+cd
 
 
-#################################################### Useful commands ###################################################
-zenecho ""
-echo ""
-echo "Now type \"~/zen/src/zend\" or \"zend\" to launch ZenCash!"
-echo "\n"
-echo "Check totalbalance: zen-cli z_gettotalbalance"
-echo "\n"
-echo "Get new address: zen-cli z_getnewaddress"
-echo "\n"
-echo "List all addresses: zen-cli z_listaddresses"
-echo "\n"
-echo "Get network info: zen-cli getnetworkinfo. Make sure 'tls_cert_verified' is true."
-echo "\n"
-echo "###############################################################################################################"
-echo "\n"
-echo "Deposit 5 x 0.2 ZEN in private address within VPS"
-echo "\n"
-echo "Run app from /$USER/secnodetracker/ directory: \"node setup.js\" and \"node app.js\""
-echo "\n"
-echo "ALL DONE! "
-echo ""
-echo ""
+
+cd secnodetracker
+node app.js &
 
