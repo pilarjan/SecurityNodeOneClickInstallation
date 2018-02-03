@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
 
-MAIL=
-DOMAIN=
-HOST=$(hostname -f)
-HOST_NAME=${HOST}.${DOMAIN}
+
+# -------------------------------------- PERSONAL - SETTINGS -----------------------------------------------------------
+MAIL=your@email
+# If SSL_CERTIFICATE_CHOICE=1, you have to set this:
+CERT="cert.crt"
+CERT_KEY="my_key.key"
+CA="CA.crt"
+
+# -------------------------------------- GENERAL - SETTINGS ------------------------------------------------------------
+HOST_NAME=$(hostname -f)
 FQDN=${HOST_NAME}
 USER=$(whoami)
 IPv=4
@@ -14,12 +20,16 @@ REGION=eu
 # ZEN_INSTALL_CHOICE="${ZEN_INSTALL_CHOICE:-${DEFAULT}}"
 ZEN_INSTALL_CHOICE=1
 
+# I am using my own wildcard certificate = 1, free letsencrypt = 2
+SSL_CERTIFICATE_CHOICE=1
+
+# -------------------------------------- PRINT - OF - SETTINGS ---------------------------------------------------------
 purpleColor='\033[0;95m'
 normalColor='\033[0m'
 echo -e ${purpleColor}"---------------------------------------------------------------------------------"
-echo -e ${purpleColor}"Host: $HOST"
+# echo -e ${purpleColor}"Host: $HOST"
 echo -e ${purpleColor}"Email: $MAIL"
-echo -e ${purpleColor}"Domain: $DOMAIN"
+# echo -e ${purpleColor}"Domain: $DOMAIN"
 echo -e ${purpleColor}"Host name: $HOST_NAME"
 echo -e ${purpleColor}"FQDN: $FQDN"
 echo -e ${purpleColor}"IP version: $IPv"
@@ -31,11 +41,13 @@ else
 fi
 echo -e ${purpleColor}"---------------------------------------------------------------------------------"${normalColor}
 
-T_ADDRESS_000=
-T_ADDRESS_001=
-T_ADDRESS_002=
-T_ADDRESS_003=
-T_ADDRESS_004=
-
+# -------------------------------------- LIST - OF - T-ADDRESSESS ------------------------------------------------------
+# Set these your staking addresses here
+# T_ADDRESS_000=
+# T_ADDRESS_001=
+# T_ADDRESS_002=
+# T_ADDRESS_003=
+# T_ADDRESS_004=
+# ETC ...
 
 echo "Loading from my_config.sh has been finished!"
