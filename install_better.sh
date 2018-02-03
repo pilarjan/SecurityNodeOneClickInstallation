@@ -95,18 +95,18 @@ locale-gen en_US en_US.UTF-8 cs_CZ cs_CZ.UTF-8
 dpkg-reconfigure locales
 
 # sudo dpkg --configure -a
-
-sudo apt-get update && apt-get upgrade -y && apt-get dist-upgrade -y
-sudo apt-get install -y build-essential pkg-config libc6-dev m4 g++-multilib autoconf monit libtool ncurses-dev unzip git htop python zlib1g-dev wget bsdmainutils pwgen automake libgtk2.0-dev
+sudo apt-get update && apt-get upgrade -y && apt-get dist-upgrade -y && apt-get autoremove -y
+sudo apt-get install -y build-essential pkg-config libc6-dev m4 g++-multilib autoconf monit libtool ncurses-dev unzip git htop python zlib1g-dev wget bsdmainutils pwgen automake libgtk2.0-dev monit
 # sudo apt-get install -y rkhunter fail2ban
 # sudo systemctl enable fail2ban
 # sudo systemctl start fail2ban
+
 sudo apt -y install npm
 sudo npm install -g n
 sudo n 8.9
 sudo npm install pm2 -g
 sudo apt-get autoremove -y
-
+sudo npm install pm2 -g
 
 ################################################################ basic security ########################################
 sudo ufw default allow outgoing
@@ -121,17 +121,17 @@ sudo ufw --force enable
 echo -e ${purpleColor}"Basic security completed!"${normalColor}
 
 ################################################################# Add a swapfile. ######################################
-if [ $(cat /proc/swaps | wc -l) -eq 2 ]; then
-    echo "Configuring your swapfile..."
-    sudo fallocate -l 3G /swapfile
-    sudo chmod 600 /swapfile
-    sudo mkswap /swapfile
-    sudo swapon /swapfile
-    echo "/swapfile   none    swap    sw    0   0" >> /etc/fstab
-else
-    echo "Swapfile exists. Skipping."
-fi
-echo -e ${purpleColor}"Swapfile is done!"${normalColor}
+#if [ $(cat /proc/swaps | wc -l) -eq 2 ]; then
+#    echo "Configuring your swapfile..."
+#    sudo fallocate -l 3G /swapfile
+#    sudo chmod 600 /swapfile
+#    sudo mkswap /swapfile
+#    sudo swapon /swapfile
+#    echo "/swapfile   none    swap    sw    0   0" >> /etc/fstab
+#else
+#    echo "Swapfile exists. Skipping."
+#fi
+#echo -e ${purpleColor}"Swapfile is done!"${normalColor}
 
 #################################### Create an empty zen config file and add new config settings. ######################
 if [ -f /${USER}/.zen/zen.conf ]; then
@@ -305,17 +305,60 @@ touch /${USER}/secnodetracker/config/rpcuser
 sudo echo -n ${RPC_USERNAME} >> /${USER}/secnodetracker/config/rpcuser
 
 touch /${USER}/secnodetracker/config/servers
-sudo echo -n "ts1.eu,ts1.na,ts1.sea" >> /${USER}/secnodetracker/config/servers
+sudo echo -n "ts1.eu,ts1.na,ts1.sea,ts2.eu,ts2.na" >> /${USER}/secnodetracker/config/servers
 
 N_BLOCK=`zen-cli getblockcount`
 echo -e ${purpleColor}"Synced # of blocks: "${N_BLOCK}${normalColor}
+
+cd
+
+systemctl disable lvm2-monitor.service
+systemctl disable lxcfs.service
+systemctl disable lxd-containers.service
+systemctl disable mdadm.service
+systemctl disable ondemand.service
+systemctl disable open-iscsi.service
+
+# Optimise your block io:
+echo 0 > /sys/block/vda/queue/rotational
+echo 0 > /sys/block/vda/queue/rq_affinity
+
+# /etc/sysctl.conf
+sudo echo "net.core.rmem_max=16777216" >> /etc/sysctl.conf
+sudo echo "net.core.wmem_max=16777216" >> /etc/sysctl.conf
+sudo echo "net.ipv4.tcp_rmem=4096 87380 16777216" >> /etc/sysctl.conf
+sudo echo "net.ipv4.tcp_wmem=4096 65536 16777216" >> /etc/sysctl.conf
+
+# increase swapiness to 80
+echo "80" > /proc/sys/vm/swappiness
+
+cd /root/secnodetracker
+pm2 start app.js --name secnodetracker
+pm2 save
+pm2 startup
+
+# add zend autorestarter
+sudo echo "### added on setup for zend" >> /etc/monit/monitrc
+sudo echo "set httpd port 2812" >> /etc/monit/monitrc
+sudo echo "use address localhost # only accept connection from localhost" >> /etc/monit/monitrc
+sudo echo "allow localhost # allow localhost to connect to the server" >> /etc/monit/monitrc
+sudo echo "### zend process control" >> /etc/monit/monitrc
+sudo echo "check process zend with pidfile /root/.zen/zen_node.pid" >> /etc/monit/monitrc
+sudo echo 'start program = "/root/zen_node.sh start" with timeout 60 seconds' >> /etc/monit/monitrc
+sudo echo 'stop program = "/root/zen_node.sh stop"' >> /etc/monit/monitrc
+
+sudo monit reload
+sudo monit start zend
+sudo monit status
+
+# clear crontab
+crontab -r
+
+# MINUTE=$[ ( $RANDOM % 60 ) ]
+# crontab -l | { cat; echo "$MINUTE */1 * * * /usr/bin/pkill -f secnodetracker"; } | crontab -
 
 echo -e ${purpleColor}"Z address: "${Z_ADDRESS}${normalColor}
 
 rm /root/my_config.sh && rm /root/install_better.sh
 
-# sudo apt-get update && apt-get upgrade -y
-
 reboot now
-
-
