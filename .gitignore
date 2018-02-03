@@ -49,9 +49,7 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
-foo.sh
 my_config.sh
-
 .idea/SecurityNodeOneClickInstallation.iml
 .idea/inspectionProfiles/
 .idea/misc.xml

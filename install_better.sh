@@ -202,7 +202,7 @@ case ${ZEN_INSTALL_CHOICE} in
        sudo apt-get update
        sudo apt-get install zen -y
 
-       sudo chown -R $USER:$USER /$USER/.zen
+       sudo chown -R ${USER}:${USER} /${USER}/.zen
        zend
        zen-fetch-params
      fi
