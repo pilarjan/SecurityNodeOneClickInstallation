@@ -59,5 +59,6 @@ my_config.sh
 .idea/preferred-vcs.xml
 .idea/vcs.xml
 wallets/
+wallets_backup/
 change_email.sh
 cert/
