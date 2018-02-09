@@ -11,7 +11,7 @@ function batch {
     date
 #    echo -e ${purpleColor} date ${normalColor}
 #    echo "Node:" $1 "| time:" date
-    ssh $1 "bash -s" < to021.sh
+    ssh $1 "bash -s" < secnodetracker_to021.sh
 }
 
 for NODE in {${NODE_START}..${NODE_STOP}}

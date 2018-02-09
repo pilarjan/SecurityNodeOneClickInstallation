@@ -70,7 +70,7 @@ case ${SSL_CERTIFICATE_CHOICE} in
     2)
         echo "LETS ENCRYPT CERTIFICATE:"
         if [ ! -d /${USER}/acme.sh ]; then
-            sudo apt install socat
+            sudo apt-get install socat
             cd /${USER} && git clone https://github.com/Neilpang/acme.sh.git
             cd /${USER}/acme.sh && sudo ./acme.sh --install
             sudo chown -R ${USER}:${USER} /${USER}/.acme.sh
