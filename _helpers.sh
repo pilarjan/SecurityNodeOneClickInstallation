@@ -32,9 +32,11 @@ crontab -r
 
 tail -f /proc/<pid>/fd/1
 
-
+zen-cli stop
 sudo monit start zend
+
 sudo monit stop zend
+zend --rescan
 
 
 ssh ${NODE}
