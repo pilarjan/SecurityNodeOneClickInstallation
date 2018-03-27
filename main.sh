@@ -2,7 +2,7 @@
 
 
 #-------------------------------------------------- STEP 1 -------------------------------------------------------------
-NODE=002
+NODE=177
 
 ssh-copy-id ${NODE}
 
@@ -20,3 +20,4 @@ source ./install_better.sh
 #-------------------------------------------------- STEP 3 -------------------------------------------------------------
 # Backup wallet.dat from node
 scp root@${NODE}:/root/.zen/wallet.dat ./wallets/${NODE}_wallet.dat
+scp root@${NODE}:/root/.zen/wallet.dat ./wallets_backup/${NODE}_wallet.dat

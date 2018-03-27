@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+SHELL=/bin/bash
+*/5 * * * * result=$(curl -s "https://securenodes$(cat ~/zencash/secnodetracker/config/home | cut -b 3-).zensystem.io/api/grid/$(cat ~/zencash/secnodetracker/config/nodeid)/crs" |  python -c "import sys, json; print json.load(sys.stdin)['rows'][0]['result']") && if [ "$result" == 'fail' ]; then curl -s "https://securenodes$(cat ~/zencash/secnodetracker/config/home | cut -b 3-).zensystem.io/$(zen-cli listaddresses | grep -v ',\|\[\|]' | tr -d '\"\ ')/$(cat ~/zencash/secnodetracker/config/nodeid)/send"; fi

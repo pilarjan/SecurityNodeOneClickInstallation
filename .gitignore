@@ -62,3 +62,4 @@ cert/
 replicated_mods/
 my_config.sh
 update_scripts/main_update_cert.sh
+/batch/*.txt
