@@ -2,16 +2,16 @@
 
 
 # -------------------------------------- PERSONAL - SETTINGS -----------------------------------------------------------
-MAIL=your@email
+MAIL=jan.pilar@icloud.com
 # If SSL_CERTIFICATE_CHOICE=1, you have to set this:
 CERT="cert.crt"
 CERT_KEY="my_key.key"
 CA="CA.crt"
 
 # -------------------------------------- GENERAL - SETTINGS ------------------------------------------------------------
-HOST_NAME=$(hostname -f)
-FQDN=${HOST_NAME}
-USER=$(whoami)
+HOST_NAME=$test.zennode4u.com
+FQDN=${test.zennode4u.com}
+USER=$test
 IPv=4
 REGION=eu
 # zen installation method:
